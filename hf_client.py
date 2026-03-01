@@ -45,7 +45,7 @@ from huggingface_hub import InferenceClient
 
 client = InferenceClient(
     provider="fal-ai",
-    api_key=os.environ["HF_TOKEN"],
+    api_key=os.environ["HF_API_KEY"],
 )
 
 def generate_image(prompt: str):

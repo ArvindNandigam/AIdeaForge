@@ -40,7 +40,26 @@ def query_text_model(prompt: str) -> str:
     # Chat completion returns nested structure
     return data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
-def generate_image(prompt: str) -> str:
-    # Fallback real AI image service
-    encoded = urllib.parse.quote(f"Professional campus event poster: {prompt}")
-    return f"https://image.pollinations.ai/prompt/{encoded}"
+def generate_image(prompt: str):
+    if not HF_API_KEY:
+        return None
+
+    image_model = "stabilityai/stable-diffusion-2"
+
+    API_URL = f"https://api-inference.huggingface.co/models/{image_model}"
+
+    headers = {
+        "Authorization": f"Bearer {HF_API_KEY}"
+    }
+
+    payload = {
+        "inputs": f"Professional modern campus event poster, high quality, {prompt}"
+    }
+
+    response = requests.post(API_URL, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        return response.content  # return raw image bytes
+    else:
+        print("Image error:", response.text)
+        return None

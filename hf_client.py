@@ -40,11 +40,12 @@ def query_text_model(prompt: str) -> str:
     # Chat completion returns nested structure
     return data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
+import os
 from huggingface_hub import InferenceClient
 
 client = InferenceClient(
-    provider="hf-inference",
-    api_key=HF_API_KEY,
+    provider="fal-ai",
+    api_key=os.environ["HF_TOKEN"],
 )
 
 def generate_image(prompt: str):

@@ -7,7 +7,7 @@ load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-TEXT_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
+TEXT_MODEL = "HuggingFaceH4/zephyr-7b-beta"
 
 HEADERS = {
     "Authorization": f"Bearer {HF_API_KEY}",

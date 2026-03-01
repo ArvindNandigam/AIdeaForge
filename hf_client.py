@@ -50,7 +50,7 @@ client = InferenceClient(
 def generate_image(prompt: str):
     image = client.text_to_image(
         prompt,
-        model="stabilityai/stable-diffusion-xl-base-1.0",
+        model="dreamlike-art/dreamlike-photoreal-2.0",
         width=512,
         height=512,
         num_inference_steps=30,

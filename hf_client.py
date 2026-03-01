@@ -6,8 +6,7 @@ load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-# Stable small instruct model
-CHAT_MODEL = "microsoft/Phi-3-mini-4k-instruct"
+CHAT_MODEL = "HuggingFaceH4/zephyr-7b-beta"
 
 BASE_URL = "https://router.huggingface.co/v1"
 
@@ -16,12 +15,12 @@ headers = {
     "Content-Type": "application/json"
 }
 
-
 def query_text_model(prompt):
     API_URL = f"{BASE_URL}/chat/completions"
 
     payload = {
         "model": CHAT_MODEL,
+        "provider": "hf-inference",
         "messages": [
             {"role": "system", "content": "You are a helpful campus innovation assistant."},
             {"role": "user", "content": prompt}
@@ -36,14 +35,4 @@ def query_text_model(prompt):
         return f"Error {response.status_code}: {response.text}"
 
     data = response.json()
-
-    try:
-        return data["choices"][0]["message"]["content"]
-    except:
-        return "Error: Unexpected model response."
-
-
-# Stable fallback image generator (no HF image instability)
-def generate_image(prompt):
-    safe_prompt = prompt.replace(" ", "+")[:100]
-    return f"https://dummyimage.com/800x400/1e1e1e/ffffff&text={safe_prompt}"
+    return data["choices"][0]["message"]["content"]

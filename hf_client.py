@@ -6,8 +6,8 @@ load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-TEXT_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
-IMAGE_MODEL = "stabilityai/stable-diffusion-2"
+TEXT_MODEL = "google/flan-t5-large"
+IMAGE_MODEL = "ByteDance/Hyper-SD-XL-2.1"
 
 headers = {
     "Authorization": f"Bearer {HF_API_KEY}"

@@ -15,7 +15,7 @@ headers = {
 
 
 def query_text_model(prompt):
-    API_URL = f"https://api-inference.huggingface.co/models/{TEXT_MODEL}"
+    API_URL = f"https://router.huggingface.co/hf-inference/models/{TEXT_MODEL}"
     
     payload = {
         "inputs": prompt,
@@ -34,7 +34,7 @@ def query_text_model(prompt):
 
 
 def generate_image(prompt):
-    API_URL = f"https://api-inference.huggingface.co/models/{IMAGE_MODEL}"
+    API_URL = f"https://router.huggingface.co/hf-inference/models/{IMAGE_MODEL}"
     
     payload = {"inputs": prompt}
 

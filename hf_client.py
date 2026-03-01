@@ -7,49 +7,40 @@ load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-TEXT_MODEL = "HuggingFaceH4/zephyr-7b-beta"
+# Try a model supported by inference providers
+TEXT_MODEL = "Qwen/Qwen2.5-Coder-7B-Instruct"
 
-HEADERS = {
+BASE_URL = "https://router.huggingface.co/v1"
+
+headers = {
     "Authorization": f"Bearer {HF_API_KEY}",
-    "Content-Type": "application/json",
+    "Content-Type": "application/json"
 }
 
 def query_text_model(prompt: str) -> str:
-    if not HF_API_KEY:
-        return "Error: HF_API_KEY not set."
-
-    url = "https://router.huggingface.co/v1/chat/completions"
+    url = f"{BASE_URL}/chat/completions"
 
     payload = {
         "model": TEXT_MODEL,
+        "provider": "auto",  # Let HF choose a provider if available
         "messages": [
-            {"role": "system", "content": "You are an expert event planning assistant."},
+            {"role": "system", "content": "You are a helpful assistant for campus event planning."},
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.7,
-        "max_tokens": 500,
+        "max_tokens": 450
     }
 
-    try:
-        response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+    response = requests.post(url, headers=headers, json=payload)
 
-        if response.status_code != 200:
-            return f"Error {response.status_code}: {response.text}"
+    if response.status_code != 200:
+        return f"Error {response.status_code}: {response.text}"
 
-        data = response.json()
-
-        return data["choices"][0]["message"]["content"]
-
-    except Exception as e:
-        return f"Error: {str(e)}"
+    data = response.json()
+    # Chat completion returns nested structure
+    return data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
 def generate_image(prompt: str) -> str:
-    """
-    Uses Pollinations AI (free, no key required)
-    Returns a public image URL
-    """
-    encoded_prompt = urllib.parse.quote(
-        f"Professional event poster, modern design, high quality, {prompt}"
-    )
-
-    return f"https://image.pollinations.ai/prompt/{encoded_prompt}"
+    # Fallback real AI image service
+    encoded = urllib.parse.quote(f"Professional campus event poster: {prompt}")
+    return f"https://image.pollinations.ai/prompt/{encoded}"

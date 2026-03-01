@@ -50,7 +50,7 @@ client = InferenceClient(
 def generate_image(prompt: str):
     image = client.text_to_image(
         prompt,
-        model="ByteDance/SDXL-Lightning",
+        model="black-forest-labs/FLUX.1-Krea-dev",
         width=512,
         height=512,
         num_inference_steps=30,

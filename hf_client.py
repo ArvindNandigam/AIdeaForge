@@ -40,20 +40,20 @@ def query_text_model(prompt: str) -> str:
     # Chat completion returns nested structure
     return data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
+from huggingface_hub import InferenceClient
+
+client = InferenceClient(
+    provider="hf-inference",
+    api_key=HF_API_KEY,
+)
+
 def generate_image(prompt: str):
-    image_model = "runwayml/stable-diffusion-v1-5"
-    API_URL = f"https://api-inference.huggingface.co/models/{image_model}"
-
-    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
-
-    payload = {"inputs": prompt}
-
-    response = requests.post(API_URL, headers=headers, json=payload)
-
-    print("IMAGE STATUS:", response.status_code)
-    print("IMAGE RESPONSE:", response.text)
-
-    if response.status_code == 200:
-        return response.content
-    else:
-        return None
+    image = client.text_to_image(
+        prompt,
+        model="stabilityai/stable-diffusion-xl-base-1.0",
+        width=512,
+        height=512,
+        num_inference_steps=30,
+        guidance_scale=7.5,
+    )
+    return image

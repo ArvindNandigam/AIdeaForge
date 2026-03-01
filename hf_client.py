@@ -50,7 +50,7 @@ client = InferenceClient(
 def generate_image(prompt: str):
     image = client.text_to_image(
         prompt,
-        model="runwayml/stable-diffusion-v2",
+        model="stabilityai/stable-diffusion-xl-refiner-1.0",
         width=512,
         height=512,
         num_inference_steps=30,

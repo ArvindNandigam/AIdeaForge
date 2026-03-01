@@ -1,5 +1,6 @@
 from hf_client import query_text_model, generate_image
 import json
+import re
 
 
 def run_pipeline(user_input):
@@ -21,16 +22,22 @@ Return ONLY valid JSON in this exact format:
 Campus Idea:
 {user_input}
 
-If a field is missing, intelligently infer it.
-Do not include explanations.
 Only return JSON.
 """
 
     structured_output = query_text_model(structured_prompt)
 
-    try:
-        structured_json = json.loads(structured_output)
-    except:
+    json_match = re.search(r"\{.*\}", structured_output, re.DOTALL)
+
+    if json_match:
+        try:
+            structured_json = json.loads(json_match.group())
+        except:
+            structured_json = None
+    else:
+        structured_json = None
+
+    if not structured_json:
         structured_json = {
             "event_name": "AI Campus Initiative",
             "date": "To Be Decided",
@@ -39,11 +46,12 @@ Only return JSON.
             "target_audience": "Students"
         }
 
-    # ---------- Event Plan Generation ----------
+    # ---------- Event Plan ----------
     plan_prompt = f"""
-Create a detailed campus event plan based on:
+Create a detailed campus event plan.
 
-{structured_json}
+Structured Data:
+{json.dumps(structured_json, indent=2)}
 
 Include:
 - Overview
@@ -55,8 +63,8 @@ Include:
 
     event_plan = query_text_model(plan_prompt)
 
-    # ---------- Poster Generation ----------
-    image_url = generate_image(structured_json.get("event_name", "Campus Event"))
+    # ---------- Poster ----------
+    image_url = generate_image(structured_json["event_name"])
 
     return {
         "structured": structured_json,

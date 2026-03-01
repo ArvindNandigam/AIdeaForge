@@ -31,5 +31,4 @@ if st.button("Generate"):
         st.write(result["plan"])
 
         st.subheader("Generated Poster")
-        st.write("DEBUG IMAGE VALUE:", result["image"])
         st.image(result["image"])

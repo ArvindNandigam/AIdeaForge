@@ -27,8 +27,8 @@ def query_text_model(prompt: str) -> str:
             {"role": "system", "content": "You are a helpful assistant for campus event planning."},
             {"role": "user", "content": prompt}
         ],
-        "temperature": 0.7,
-        "max_tokens": 450
+        "temperature": 1,
+        "max_tokens": 2000
     }
 
     response = requests.post(url, headers=headers, json=payload)
@@ -50,7 +50,7 @@ client = InferenceClient(
 def generate_image(prompt: str):
     image = client.text_to_image(
         prompt,
-        model="stabilityai/stable-diffusion-xl-base-1.0",
+        model="runwayml/stable-diffusion-v2",
         width=512,
         height=512,
         num_inference_steps=30,

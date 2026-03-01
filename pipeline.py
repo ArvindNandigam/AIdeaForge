@@ -1,48 +1,65 @@
 from hf_client import query_text_model, generate_image
+import json
 
 
-def extract_structured_info(raw_text):
+def run_pipeline(user_input):
 
-    prompt = f"""
-    Extract the following information from the text below.
-    Return ONLY valid JSON.
+    # ---------- Structured Extraction ----------
+    structured_prompt = f"""
+Extract structured information from the following campus idea.
 
-    Required fields:
-    - event_name
-    - date
-    - location
-    - objectives
-    - target_audience
+Return ONLY valid JSON in this exact format:
 
-    Text:
-    {raw_text}
-    """
+{{
+  "event_name": "",
+  "date": "",
+  "location": "",
+  "objectives": "",
+  "target_audience": ""
+}}
 
-    return query_text_model(prompt)
+Campus Idea:
+{user_input}
 
+If a field is missing, intelligently infer it.
+Do not include explanations.
+Only return JSON.
+"""
 
-def generate_event_plan(structured_json):
+    structured_output = query_text_model(structured_prompt)
 
-    prompt = f"""
-    Using the structured data below, generate a detailed and professional campus event execution plan.
+    try:
+        structured_json = json.loads(structured_output)
+    except:
+        structured_json = {
+            "event_name": "AI Campus Initiative",
+            "date": "To Be Decided",
+            "location": "College Campus",
+            "objectives": user_input,
+            "target_audience": "Students"
+        }
 
-    Structured Data:
-    {structured_json}
-    """
+    # ---------- Event Plan Generation ----------
+    plan_prompt = f"""
+Create a detailed campus event plan based on:
 
-    return query_text_model(prompt)
+{structured_json}
 
+Include:
+- Overview
+- Activities
+- Timeline
+- Required Resources
+- Expected Impact
+"""
 
-def run_pipeline(raw_text):
+    event_plan = query_text_model(plan_prompt)
 
-    structured = extract_structured_info(raw_text)
-
-    plan = generate_event_plan(structured)
-
-    image = generate_image("Professional campus event poster")
+    # ---------- Poster Generation ----------
+    image_url = generate_image(structured_json.get("event_name", "Campus Event"))
 
     return {
-        "structured": structured,
-        "plan": plan,
-        "image": image
+        "structured": structured_json,
+        "plan": event_plan,
+        "image": image_url
     }

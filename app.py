@@ -1,33 +1,34 @@
 import streamlit as st
-from file_handler import extract_text
 from pipeline import run_pipeline
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="AIdeaForge", layout="wide")
+
 st.title("AIdeaForge - Multimodal AI Prototype")
 
-mode = st.radio("Choose Input Type:", ["Manual Prompt", "Upload File"])
+input_type = st.radio("Choose Input Type:", ["Manual Prompt", "Upload File"])
 
-raw_text = None
+user_input = ""
 
-if mode == "Manual Prompt":
-    raw_text = st.text_area("Enter campus idea")
+if input_type == "Manual Prompt":
+    user_input = st.text_area("Enter campus idea")
 
-else:
-    uploaded_file = st.file_uploader("Upload TXT or PDF", type=["txt", "pdf"])
+elif input_type == "Upload File":
+    uploaded_file = st.file_uploader("Upload .txt file", type=["txt"])
     if uploaded_file:
-        raw_text = extract_text(uploaded_file)
+        user_input = uploaded_file.read().decode("utf-8")
 
-if st.button("Run AI Workflow") and raw_text:
+if st.button("Generate"):
+    if user_input.strip() == "":
+        st.warning("Please provide input.")
+    else:
+        with st.spinner("Generating AI outputs..."):
+            result = run_pipeline(user_input)
 
-    with st.spinner("Processing via HuggingFace API..."):
-        result = run_pipeline(raw_text)
+        st.subheader("Structured Extraction")
+        st.json(result["structured"])
 
-    st.subheader("Structured Extraction")
-    st.code(result["structured"])
+        st.subheader("Generated Event Plan")
+        st.write(result["plan"])
 
-    st.subheader("Generated Event Plan")
-    st.write(result["plan"])
-
-    if result["image"]:
         st.subheader("Generated Poster")
         st.image(result["image"])

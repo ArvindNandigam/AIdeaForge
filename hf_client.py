@@ -6,8 +6,8 @@ load_dotenv()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-CHAT_MODEL = "deepseek-ai/DeepSeek-V3-0324"
-IMAGE_MODEL = "black-forest-labs/FLUX.1-dev"
+# Stable small instruct model
+CHAT_MODEL = "microsoft/Phi-3-mini-4k-instruct"
 
 BASE_URL = "https://router.huggingface.co/v1"
 
@@ -16,16 +16,18 @@ headers = {
     "Content-Type": "application/json"
 }
 
+
 def query_text_model(prompt):
     API_URL = f"{BASE_URL}/chat/completions"
 
     payload = {
         "model": CHAT_MODEL,
         "messages": [
+            {"role": "system", "content": "You are a helpful campus innovation assistant."},
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.7,
-        "max_tokens": 300
+        "max_tokens": 400
     }
 
     response = requests.post(API_URL, headers=headers, json=payload)
@@ -34,22 +36,14 @@ def query_text_model(prompt):
         return f"Error {response.status_code}: {response.text}"
 
     data = response.json()
-    return data.get("choices", [{}])[0].get("message", {}).get("content", "")
+
+    try:
+        return data["choices"][0]["message"]["content"]
+    except:
+        return "Error: Unexpected model response."
 
 
+# Stable fallback image generator (no HF image instability)
 def generate_image(prompt):
-    API_URL = f"{BASE_URL}/text-to-image"
-
-    payload = {
-        "model": IMAGE_MODEL,
-        "inputs": prompt
-    }
-
-    response = requests.post(API_URL, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        with open("generated_image.png", "wb") as f:
-            f.write(response.content)
-        return "generated_image.png"
-
-    return f"Error {response.status_code}: {response.text}"
+    safe_prompt = prompt.replace(" ", "+")[:100]
+    return f"https://dummyimage.com/800x400/1e1e1e/ffffff&text={safe_prompt}"

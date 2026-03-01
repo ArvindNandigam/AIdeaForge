@@ -51,7 +51,7 @@ client = InferenceClient(
 def generate_image(prompt: str):
     image = client.text_to_image(
         prompt,
-        model="black-forest-labs/FLUX.1-Krea-dev",
+        model="stabilityai/stable-diffusion-xl-base-1.0",
         width=512,
         height=512,
         num_inference_steps=30,
